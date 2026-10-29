@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Morning digest
@@ -77,3 +78,27 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Plan section | Blocked by |
+|---|-------|--------------|------------|
+| [1](https://github.com/MrocznyBanan/mega-s01e04-rig/issues/1) | Read and aggregate nightly job logs | 1 | — |
+| [2](https://github.com/MrocznyBanan/mega-s01e04-rig/issues/2) | Render the nightly digest page | 2a | #1 type/signature contract |
+| [3](https://github.com/MrocznyBanan/mega-s01e04-rig/issues/3) | Expose the digest JSON endpoint | 2b | #1 type/signature contract |
+| [4](https://github.com/MrocznyBanan/mega-s01e04-rig/issues/4) | Link status-board nights to their digests | 2c | #1 type/signature contract |
+| [5](https://github.com/MrocznyBanan/mega-s01e04-rig/issues/5) | Test HTML and JSON digest routes | 2d | #1 type/signature contract; #2 and #3 for final validation |
+| [6](https://github.com/MrocznyBanan/mega-s01e04-rig/issues/6) | Publish and submit the review preview | 3 | #1–#5 |
+| [7](https://github.com/MrocznyBanan/mega-s01e04-rig/issues/7) | Remove preview marker and archive the plan | 4 | #6, actual review received, separate replacement approval |
+
+## Completion
+
+The reviewer explicitly confirmed seeing the preview on 2026-10-29. After separate informed
+human approval, the sample digest was rendered again through localhost HTTP from a clean
+process with `LANE_MARKER` unset and without loading any environment file. Only that fresh
+self-contained HTML was uploaded to the existing Netlify project.
+
+The same public preview remains at https://amazing-rugelach-8263d7.netlify.app/ with the banner
+"no marker set". Anonymous HTTPS returned 200 and exactly matched the fresh HTML; the assigned
+marker was absent, all five sample jobs were retained, and no scripts or external assets were
+present. The completed plan is archived here; course acceptance is a separate coordinator step.
