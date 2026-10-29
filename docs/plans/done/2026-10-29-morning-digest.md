@@ -99,6 +99,19 @@ process with `LANE_MARKER` unset and without loading any environment file. Only 
 self-contained HTML was uploaded to the existing Netlify project.
 
 The same public preview remains at https://amazing-rugelach-8263d7.netlify.app/ with the banner
-"no marker set". Anonymous HTTPS returned 200 and exactly matched the fresh HTML; the assigned
-marker was absent, all five sample jobs were retained, and no scripts or external assets were
-present. The completed plan is archived here; course acceptance is a separate coordinator step.
+"no marker set". The assigned marker remains absent and all five sample jobs were retained.
+Successful Node/urllib HTTPS checks returned 200 and exactly matched the fresh 2,392-byte HTML,
+but that observation did not hold across clients and requests. The generated application HTML
+has one inline stylesheet, no scripts, and no external assets.
+
+Netlify Free injects a provider comment and public HUD JavaScript into the response received
+by Chromium: the observed response was 2,927 bytes with one script at
+`/.netlify/scripts/hud?variant=public`. Other coordinator probes also observed injection.
+The existing project's badge-disable setting requires a paid upgrade. Strict cross-client byte
+identity and zero JavaScript in the public response were NOT achieved.
+
+The human chose to remain on Free and submit this documented hosting limitation for course
+evaluation, without an upgrade or workaround. This accepts the hosting limitation for
+evaluation only; it is not a guarantee of acceptance or a waiver of course requirements.
+The completed marker-removal/archive plan remains here; the coordinator handles course
+submission and acceptance separately.
