@@ -1,12 +1,12 @@
 import { readdirSync } from 'node:fs';
 import type { RigConfig } from './config.js';
 import { lastBeat, type Beat } from './heartbeat.js';
-import { readNight } from './digest/reader.js';
 import type { DigestCounts } from './digest/types.js';
+import type { ReadNight } from './digest/types.js';
 
 export type Night = {
   date: string;
-  counts: DigestCounts;
+  counts: DigestCounts | null;
 };
 
 export type Status = {
@@ -30,12 +30,23 @@ export function nightsOnDisk(runsDir: string): string[] {
 }
 
 export function readStatus(config: RigConfig): Status {
+  let readNight: ReadNight | null = null;
+  try {
+    // Dynamically import reader if available (provided by issue #1)
+    const module = require('./digest/reader.js') as { readNight?: ReadNight };
+    readNight = module.readNight ?? null;
+  } catch {
+    // Reader not available yet
+  }
+
   const nights = nightsOnDisk(config.runsDir).map((date) => {
-    const result = readNight(config.runsDir, date);
-    const counts: DigestCounts =
-      result.kind === 'found'
-        ? result.counts
-        : { ok: 0, retry: 0, fail: 0 };
+    let counts: DigestCounts | null = null;
+    if (readNight) {
+      const result = readNight(config.runsDir, date);
+      if (result.kind === 'found') {
+        counts = result.counts;
+      }
+    }
     return { date, counts };
   });
 

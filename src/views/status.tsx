@@ -23,7 +23,9 @@ export function StatusBoard({ status }: { status: Status }) {
             <li>
               <a href={`/digest/${n.date}`}>{n.date}</a>{' '}
               <span class="mute">
-                {n.counts.ok} ok, {n.counts.retry} retry, {n.counts.fail} fail
+                {n.counts
+                  ? `${n.counts.ok} ok, ${n.counts.retry} retry, ${n.counts.fail} fail`
+                  : '— — —'}
               </span>
             </li>
           ))}
