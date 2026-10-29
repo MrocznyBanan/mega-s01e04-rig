@@ -1,11 +1,10 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createApp } from '../src/app.js';
 
 const config = { adapter: 'shim', installed: '2026-10-29T14:06:00+01:00', beatEverySeconds: 60, runsDir: 'runs' };
 
-// Mock readNight to avoid dependency on actual file system
+// Mock readNight to test route/view logic without file system dependency
 vi.mock('../src/digest/reader.js', async () => {
-  const actual = await vi.importActual<typeof import('../src/digest/reader.js')>('../src/digest/reader.js');
   return {
     readNight: vi.fn((runsDir: string, night: string) => {
       if (night === '2026-10-28') {
@@ -40,13 +39,22 @@ vi.mock('../src/digest/reader.js', async () => {
           counts: { ok: 6, retry: 4, fail: 1 },
         };
       }
+      if (night === '2026-10-27') {
+        return {
+          kind: 'found' as const,
+          night: '2026-10-27',
+          rows: [],
+          badLines: 5,
+          counts: { ok: 0, retry: 0, fail: 0 },
+        };
+      }
       return { kind: 'missing' as const, night };
     }),
   };
 });
 
 describe('digest route', () => {
-  it('shows digest for a valid night', async () => {
+  it('shows digest for a valid night with rows', async () => {
     const res = await createApp(config).request('/digest/2026-10-28');
     const html = await res.text();
     expect(res.status).toBe(200);
@@ -71,9 +79,19 @@ describe('digest route', () => {
     expect(html).toContain('<td class="warn">1</td>'); // deploy failures
   });
 
+  it('shows malformed-line warning independently when no rows but has badLines', async () => {
+    const res = await createApp(config).request('/digest/2026-10-27');
+    const html = await res.text();
+    expect(res.status).toBe(200);
+    expect(html).toContain('digest for 2026-10-27');
+    expect(html).toContain('5 malformed lines');
+    expect(html).toContain('nothing ran');
+  });
+
   it('returns 404 for missing night', async () => {
     const res = await createApp(config).request('/digest/2026-10-29');
     expect(res.status).toBe(404);
   });
 });
+
 

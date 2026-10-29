@@ -1,4 +1,4 @@
-import type { NightDigest, ReadNightResult } from '../digest/types.js';
+import type { ReadNightResult } from '../digest/types.js';
 
 export function DigestView({ result }: { result: ReadNightResult }) {
   if (result.kind === 'missing') {
@@ -10,16 +10,16 @@ export function DigestView({ result }: { result: ReadNightResult }) {
     );
   }
 
-  const { night, rows, badLines, counts } = result as NightDigest;
+  const { night, rows, badLines, counts } = result;
 
   return (
     <>
       <h1>digest for {night}</h1>
+      {badLines > 0 && <p class="warn">{badLines} malformed line{badLines !== 1 ? 's' : ''}</p>}
       {rows.length === 0 ? (
         <p class="mute">nothing ran</p>
       ) : (
         <>
-          {badLines > 0 && <p class="warn">{badLines} malformed line{badLines !== 1 ? 's' : ''}</p>}
           <table>
             <thead>
               <tr>
@@ -56,3 +56,4 @@ export function DigestView({ result }: { result: ReadNightResult }) {
     </>
   );
 }
+
