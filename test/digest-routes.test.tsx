@@ -116,4 +116,42 @@ describe('digest routes', () => {
       expect(html).toContain(row.lastStatus);
     }
   });
+
+  it('HTML returns 200 for empty existing night file', async () => {
+    writeFileSync(join(tempDir, '2026-10-30.jsonl'), '');
+    const config = { adapter: 'shim', installed: '2026-10-29T14:06:00+01:00', beatEverySeconds: 60, runsDir: tempDir };
+    const res = await createApp(config).request('/digest/2026-10-30');
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toBeTruthy();
+  });
+
+  it('HTML shows valid rows alongside bad line in same file', async () => {
+    const content = [
+      '{"at":"2026-10-30T10:00:00+01:00","job":"job-valid","status":"ok","owner":"alice"}\n',
+      'corrupt junk data here\n',
+      '{"at":"2026-10-30T10:00:01+01:00","job":"job-second","status":"fail","owner":"bob"}\n',
+    ].join('');
+    writeFileSync(join(tempDir, '2026-10-30.jsonl'), content);
+    const config = { adapter: 'shim', installed: '2026-10-29T14:06:00+01:00', beatEverySeconds: 60, runsDir: tempDir };
+    const res = await createApp(config).request('/digest/2026-10-30');
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain('job-valid');
+    expect(html).toContain('job-second');
+  });
+
+  it('HTML returns 200 for file with only malformed lines', async () => {
+    const content = [
+      'bad json\n',
+      '{incomplete json\n',
+      'not even close to valid\n',
+    ].join('');
+    writeFileSync(join(tempDir, '2026-10-30.jsonl'), content);
+    const config = { adapter: 'shim', installed: '2026-10-29T14:06:00+01:00', beatEverySeconds: 60, runsDir: tempDir };
+    const res = await createApp(config).request('/digest/2026-10-30');
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toBeTruthy();
+  });
 });
