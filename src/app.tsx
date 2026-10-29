@@ -5,6 +5,7 @@ import { readStatus } from './status.js';
 import { readNight } from './digest/reader.js';
 import { Layout } from './views/layout.js';
 import { StatusBoard } from './views/status.js';
+import { DigestView } from './views/digest.js';
 
 export function createApp(config: RigConfig = loadConfig()) {
   const app = new Hono();
@@ -26,6 +27,19 @@ export function createApp(config: RigConfig = loadConfig()) {
       return c.json(result, 404);
     }
     return c.json(result);
+  });
+
+  app.get('/digest/:night', (c) => {
+    const night = c.req.param('night');
+    const result = readNight(config.runsDir, night);
+    if (result.kind === 'missing') {
+      return c.notFound();
+    }
+    return c.html(
+      <Layout title={`digest · ${night}`} lane={lane()}>
+        <DigestView result={result} />
+      </Layout>,
+    );
   });
 
   return app;
